@@ -1,8 +1,11 @@
 package db
 
+import "errors"
+
 type ShoplistEntry struct {
 	ID     int    `db:"id"`
-	UserID string `db:"user_id"`
+	UserID int    `db:"user_id"`
+	ShopID int    `db:"shop_id"`
 	Name   string `db:"name"`
 	Qty    int    `db:"qty"`
 	Date   string `db:"date"`
@@ -10,27 +13,22 @@ type ShoplistEntry struct {
 	user *User
 }
 
-type Shoplist struct {
-	Entries []ShoplistEntry
-	Date    string
-}
-
-func GetShoplist(date string) Shoplist {
+func ShoplistForDate(date string) ([]ShoplistEntry, error) {
 	var entries []ShoplistEntry
-	db.Select(&entries, "select * from shoplist where date = ?", date)
+	err := db.Select(&entries, "select * from shoplist where date = ?", date)
 
-	return Shoplist{entries, date}
+	return entries, err
 }
 
-func FindShoplistEntry(id int64) ShoplistEntry {
+func ShoplistEntryFind(id int64) (ShoplistEntry, error) {
 	var entry ShoplistEntry
-	db.Get(&entry, "SELECT * FROM shoplist WHERE id = ?", id)
+	err := db.Get(&entry, "select * from shoplist where id = ?", id)
 
-	return entry
+	return entry, err
 }
 
-func InsertShoplistEntry(user int, name string, qty int, date string) (int64, error) {
-	result, err := db.Exec("INSERT INTO shoplist (user_id, name, qty, date) VALUES(?,?,?,?)", user, name, qty, date)
+func ShoplistEntryCreate(user int, shop int, name string, qty int, date string) (int64, error) {
+	result, err := db.Exec("INSERT INTO shoplist (user_id, shop_id, name, qty, date) VALUES(?,?,?,?)", user, shop, name, qty, date)
 
 	if err != nil {
 		return 0, err
@@ -38,6 +36,22 @@ func InsertShoplistEntry(user int, name string, qty int, date string) (int64, er
 
 	id, _ := result.LastInsertId()
 	return id, nil
+}
+
+func ShoplistEntryDelete(id int64) error {
+	result, err := db.Exec("DELETE FROM shoplist WHERE id = ?", id)
+
+	if err != nil {
+		return err
+	}
+
+	if aff, err := result.RowsAffected(); err != nil {
+		return err
+	} else if aff != 1 {
+		return errors.New("Could not delete or already deleted")
+	}
+
+	return nil
 }
 
 func (entry ShoplistEntry) User() *User {

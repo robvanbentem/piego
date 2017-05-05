@@ -3,45 +3,36 @@ package main
 import (
 	"fmt"
 
-	pdb "piego/db"
+	"github.com/gorilla/handlers"
+	"github.com/gorilla/mux"
+	"net/http"
+	"os"
+	"piego/db"
+	"piego/web"
 )
 
 func main() {
-	pdb.InitDB()
+	fmt.Printf("Starting Piego webserver\n")
+	db.InitDB()
 
-	users := pdb.AllUsers()
-	for _, user := range users {
-		fmt.Printf("%s's balance is %.2f\n", user.Name, user.Balance())
+	r := mux.NewRouter()
 
-		id, err := pdb.InsertShoplistEntry(user.ID, "Perercevelaat, vers", 1, "2017-04-28")
+	r.HandleFunc("/shops", web.ShopsAllHandler).Methods("GET")
 
-		if err != nil {
-			panic("err")
-		}
+	r.HandleFunc("/users", web.UsersHandler).Methods("GET")
+	r.HandleFunc("/users/{id}", web.UsersFindHandler).Methods("GET")
 
-		fmt.Printf("Added entry %d\n", id)
-		entry := pdb.FindShoplistEntry(id)
+	r.HandleFunc("/shoplist/{date}", web.ShoplistDateHandler).Methods("GET")
 
-		fmt.Printf("Added entry %dx %s\n", entry.Qty, entry.Name)
-	}
+	r.HandleFunc("/shoplist/entry", web.ShoplistCreateHandler).Methods("POST")
+	r.HandleFunc("/shoplist/entry/{id}", web.ShoplistFindHandler).Methods("GET")
+	r.HandleFunc("/shoplist/entry/{id}", web.ShoplistDeleteHandler).Methods("DELETE")
 
-	shoplist := pdb.GetShoplist("2017-04-28")
+	headersOk := handlers.AllowedHeaders([]string{"X-Requested-With"})
+	originsOk := handlers.AllowedOrigins([]string{"*"})
+	methodsOk := handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS"})
 
-	user_list := make(map[string][]pdb.ShoplistEntry)
+	loggedRouter := handlers.LoggingHandler(os.Stdout, r)
 
-	for _, entry := range shoplist.Entries {
-		if user_list[entry.UserID] == nil {
-			user_list[entry.UserID] = []pdb.ShoplistEntry{}
-		}
-
-		user_list[entry.UserID] = append(user_list[entry.UserID], entry)
-	}
-
-	for id, entries := range user_list {
-		fmt.Printf("Entries for %s/%s\n", id, entries[0].User().Name)
-
-		for _, entry := range entries {
-			fmt.Printf("%dx %s\n", entry.Qty, entry.Name)
-		}
-	}
+	panic(http.ListenAndServe("0.0.0.0:8004", handlers.CORS(originsOk, headersOk, methodsOk)(loggedRouter)))
 }
