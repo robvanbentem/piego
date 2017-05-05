@@ -2,6 +2,7 @@ package web
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
@@ -10,11 +11,11 @@ import (
 )
 
 type entry struct {
-	user_id int
-	shop_id int
-	name    string
-	qty     int
-	date    string
+	UserID int    `json:"user_id"`
+	ShopID int    `json:"shop_id"`
+	Name   string `json:"name"`
+	Qty    int    `json:"qty"`
+	Date   string `json:"date"`
 }
 
 func ShoplistFindHandler(w http.ResponseWriter, r *http.Request) {
@@ -41,23 +42,26 @@ func ShoplistFindHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func ShoplistCreateHandler(w http.ResponseWriter, r *http.Request) {
-	decoder := json.NewDecoder(r.Body)
-
 	var e entry
+	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&e)
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
+		log.Println(err)
 		return
 	}
 
-	id, err := db.ShoplistEntryCreate(e.user_id, e.shop_id, e.name, e.qty, e.date)
+	fmt.Printf("%+v\n", e)
+
+	id, err := db.ShoplistEntryCreate(e.UserID, e.ShopID, e.Name, e.Qty, e.Date)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
+		log.Println(err)
 		return
 	}
 
-	http.Redirect(w, r, "/shoplist/entry/"+string(id), 302)
+	http.Redirect(w, r, fmt.Sprintf("/shoplist/entry/%d", id), 302)
 }
 
 func ShoplistDateHandler(w http.ResponseWriter, r *http.Request) {

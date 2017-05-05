@@ -1,6 +1,8 @@
 package db
 
-import "errors"
+import (
+	"errors"
+)
 
 type ShoplistEntry struct {
 	ID     int    `db:"id"`
@@ -28,7 +30,7 @@ func ShoplistEntryFind(id int64) (ShoplistEntry, error) {
 }
 
 func ShoplistEntryCreate(user int, shop int, name string, qty int, date string) (int64, error) {
-	result, err := db.Exec("INSERT INTO shoplist (user_id, shop_id, name, qty, date) VALUES(?,?,?,?)", user, shop, name, qty, date)
+	result, err := db.Exec("insert into shoplist (user_id, shop_id, `name`, qty, `date`) values(?,?,?,?,?)", user, shop, name, qty, date)
 
 	if err != nil {
 		return 0, err
@@ -39,7 +41,7 @@ func ShoplistEntryCreate(user int, shop int, name string, qty int, date string) 
 }
 
 func ShoplistEntryDelete(id int64) error {
-	result, err := db.Exec("DELETE FROM shoplist WHERE id = ?", id)
+	result, err := db.Exec("delete from shoplist where id = ?", id)
 
 	if err != nil {
 		return err
@@ -48,7 +50,7 @@ func ShoplistEntryDelete(id int64) error {
 	if aff, err := result.RowsAffected(); err != nil {
 		return err
 	} else if aff != 1 {
-		return errors.New("Could not delete or already deleted")
+		return errors.New("could not delete or already deleted")
 	}
 
 	return nil

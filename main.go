@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"net/http"
@@ -28,7 +27,7 @@ func main() {
 	r.HandleFunc("/shoplist/entry/{id}", web.ShoplistFindHandler).Methods("GET")
 	r.HandleFunc("/shoplist/entry/{id}", web.ShoplistDeleteHandler).Methods("DELETE")
 
-	headersOk := handlers.AllowedHeaders([]string{"X-Requested-With"})
+	headersOk := handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type"})
 	originsOk := handlers.AllowedOrigins([]string{"*"})
 	methodsOk := handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS"})
 
