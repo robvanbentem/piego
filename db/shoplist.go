@@ -16,7 +16,7 @@ type ShoplistEntry struct {
 }
 
 func ShoplistForDate(date string) ([]ShoplistEntry, error) {
-	var entries []ShoplistEntry
+	entries := make([]ShoplistEntry, 0)
 	err := db.Select(&entries, "select * from shoplist where date = ?", date)
 
 	return entries, err
@@ -51,6 +51,17 @@ func ShoplistEntryDelete(id int64) error {
 		return err
 	} else if aff != 1 {
 		return errors.New("could not delete or already deleted")
+	}
+
+	return nil
+}
+
+func ShoplistEntryUpdate(id int64, e *ShoplistEntry) error {
+	_, err := db.Exec("update shoplist set user_id = ?, shop_id = ?, name = ?, qty = ?, date = ? where id = ?",
+		e.UserID, e.ShopID, e.Name, e.Qty, e.Date, id)
+
+	if err != nil {
+		return err
 	}
 
 	return nil

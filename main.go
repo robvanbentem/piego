@@ -26,6 +26,10 @@ func main() {
 	r.HandleFunc("/shoplist/entry", web.ShoplistCreateHandler).Methods("POST")
 	r.HandleFunc("/shoplist/entry/{id}", web.ShoplistFindHandler).Methods("GET")
 	r.HandleFunc("/shoplist/entry/{id}", web.ShoplistDeleteHandler).Methods("DELETE")
+	r.HandleFunc("/shoplist/entry/{id}", web.ShoplistUpdateHandler).Methods("PUT")
+
+	r.HandleFunc("/ledger", web.LedgerAllHandler).Methods("GET")
+	r.HandleFunc("/ledger/{date}", web.LedgerDateHandler).Methods("GET")
 
 	headersOk := handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type"})
 	originsOk := handlers.AllowedOrigins([]string{"*"})

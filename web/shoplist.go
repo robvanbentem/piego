@@ -10,14 +10,6 @@ import (
 	"strconv"
 )
 
-type entry struct {
-	UserID int    `json:"user_id"`
-	ShopID int    `json:"shop_id"`
-	Name   string `json:"name"`
-	Qty    int    `json:"qty"`
-	Date   string `json:"date"`
-}
-
 func ShoplistFindHandler(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.ParseInt(mux.Vars(r)["id"], 10, 64)
 	if err != nil {
@@ -42,7 +34,7 @@ func ShoplistFindHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func ShoplistCreateHandler(w http.ResponseWriter, r *http.Request) {
-	var e entry
+	var e db.ShoplistEntry
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&e)
 
@@ -51,8 +43,6 @@ func ShoplistCreateHandler(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 		return
 	}
-
-	fmt.Printf("%+v\n", e)
 
 	id, err := db.ShoplistEntryCreate(e.UserID, e.ShopID, e.Name, e.Qty, e.Date)
 	if err != nil {
@@ -98,4 +88,28 @@ func ShoplistDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
+}
+
+func ShoplistUpdateHandler(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.ParseInt(mux.Vars(r)["id"], 10, 64)
+
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		log.Print(err.Error())
+		return
+	}
+
+	var e db.ShoplistEntry
+	decoder := json.NewDecoder(r.Body)
+	decoder.Decode(&e)
+
+	err = db.ShoplistEntryUpdate(id, &e)
+
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		log.Print(err.Error())
+		return
+	}
+
+	http.Redirect(w, r, fmt.Sprintf("/shoplist/entry/%d", id), 302)
 }
