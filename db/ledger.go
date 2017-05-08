@@ -35,3 +35,8 @@ func LedgerEntryCreate(e LedgerEntry) (int64, error) {
 
 	return id, nil
 }
+
+func LedgerEntryUpdate(id int64, e LedgerEntry) error {
+	_, err := db.Exec("UPDATE ledger SET user_id = ?, name = ?, amount = ?, date = ? WHERE id = ?", e.UserID, e.Name, e.Amount, e.Date, id)
+	return err
+}

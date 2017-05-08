@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"piego/db"
+	"strconv"
 )
 
 func LedgerAllHandler(w http.ResponseWriter, r *http.Request) {
@@ -60,5 +61,28 @@ func LedgerEntryCreateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	id, err := db.LedgerEntryCreate(entry)
+	http.Redirect(w, r, fmt.Sprintf("/ledger/entry/%d", id), 302)
+}
+
+func LedgerEntryUpdateHandler(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.ParseInt(mux.Vars(r)["id"], 10, 64)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+
+		log.Print(err.Error())
+		return
+	}
+
+	var e db.LedgerEntry
+	decoder := json.NewDecoder(r.Body)
+	decoder.Decode(&e)
+
+	err = db.LedgerEntryUpdate(id, e)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		log.Print(err.Error())
+		return
+	}
+
 	http.Redirect(w, r, fmt.Sprintf("/ledger/entry/%d", id), 302)
 }

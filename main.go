@@ -30,31 +30,35 @@ func main() {
 	defer db.CloseDB()
 
 	r := mux.NewRouter()
+	registerRoutes(r)
 
+	// middleware
+	loggedRouter := handlers.LoggingHandler(os.Stdout, r)
+	corsHandler := getCorsHandler(loggedRouter)
+
+	log.Fatal(http.ListenAndServe(fmt.Sprintf("%s:%d", cfg.ServerAddress, cfg.ServerPort), corsHandler))
+}
+
+func registerRoutes(r *mux.Router) {
 	r.HandleFunc("/shops", web.ShopsAllHandler).Methods("GET")
-
 	r.HandleFunc("/users", web.UsersHandler).Methods("GET")
 	r.HandleFunc("/users/{id}", web.UsersFindHandler).Methods("GET")
-
 	r.HandleFunc("/shoplist/{date}", web.ShoplistDateHandler).Methods("GET")
-
 	r.HandleFunc("/shoplist/entry", web.ShoplistCreateHandler).Methods("POST")
 	r.HandleFunc("/shoplist/entry/{id}", web.ShoplistFindHandler).Methods("GET")
 	r.HandleFunc("/shoplist/entry/{id}", web.ShoplistDeleteHandler).Methods("DELETE")
 	r.HandleFunc("/shoplist/entry/{id}", web.ShoplistUpdateHandler).Methods("PUT")
-
 	r.HandleFunc("/ledger", web.LedgerAllHandler).Methods("GET")
 	r.HandleFunc("/ledger/entry", web.LedgerEntryCreateHandler).Methods("POST")
+	r.HandleFunc("/ledger/entry/{id}", web.LedgerEntryUpdateHandler).Methods("PUT")
 	r.HandleFunc("/ledger/{date}", web.LedgerDateHandler).Methods("GET")
+}
 
+func getCorsHandler(loggedRouter http.Handler) http.Handler {
 	headersOk := handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type"})
 	originsOk := handlers.AllowedOrigins([]string{"*"})
 	methodsOk := handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS"})
-
-	loggedRouter := handlers.LoggingHandler(os.Stdout, r)
-	corsHandler := handlers.CORS(originsOk, headersOk, methodsOk)(loggedRouter)
-
-	log.Fatal(http.ListenAndServe(fmt.Sprintf("%s:%d", cfg.ServerAddress, cfg.ServerPort), corsHandler))
+	return handlers.CORS(originsOk, headersOk, methodsOk)(loggedRouter)
 }
 
 func loadConfig() config {
