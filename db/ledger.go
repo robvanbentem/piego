@@ -21,3 +21,17 @@ func LedgerForDate(date string) (*[]LedgerEntry, error) {
 	err := db.Select(&entries, "SELECT * FROM ledger WHERE `date` = ?", date)
 	return &entries, err
 }
+
+func LedgerEntryCreate(e LedgerEntry) (int64, error) {
+	result, err := db.Exec("INSERT INTO ledger (user_id, name, amount, date) VALUES(?,?,?,?)", e.UserID, e.Name, e.Amount, e.Date)
+	if err != nil {
+		return 0, err
+	}
+
+	id, err := result.LastInsertId()
+	if err != nil {
+		return 0, err
+	}
+
+	return id, nil
+}

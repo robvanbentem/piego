@@ -1,11 +1,12 @@
 package web
 
 import (
-	"net/http"
-	"piego/db"
+	"encoding/json"
 	"github.com/gorilla/mux"
 	"log"
-	"encoding/json"
+	"net/http"
+	"piego/db"
+	"fmt"
 )
 
 func LedgerAllHandler(w http.ResponseWriter, r *http.Request) {
@@ -48,3 +49,16 @@ func LedgerDateHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(s)
 }
 
+func LedgerCreateHandler(w http.ResponseWriter, r *http.Request) {
+	var entry db.LedgerEntry
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(&entry)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		log.Println(err.Error())
+		return
+	}
+
+	id, err := db.LedgerEntryCreate(entry)
+	http.Redirect(w, r, fmt.Sprintf("/ledger/entry/%d", id), 302)
+}

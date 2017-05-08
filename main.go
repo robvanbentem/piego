@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
@@ -8,13 +9,13 @@ import (
 	"os"
 	"piego/db"
 	"piego/web"
-	"encoding/json"
 )
 
 type config struct {
 	ServerAddress string
 	ServerPort    int
 	DBHost        string
+	DBPort        int
 	DBUser        string
 	DBPass        string
 	DBScheme      string
@@ -25,7 +26,7 @@ func main() {
 	cfg := loadConfig()
 
 	fmt.Printf("Starting Piego webserver at %s:%d\n", cfg.ServerAddress, cfg.ServerPort)
-	db.InitDB()
+	db.InitDB(cfg.DBHost, cfg.DBPort, cfg.DBUser, cfg.DBPass, cfg.DBScheme)
 
 	r := mux.NewRouter()
 
@@ -55,9 +56,9 @@ func main() {
 }
 
 func loadConfig() config {
-	f, err := os.Open("config.json")
+	f, err := os.Open("config.json.example")
 	if err != nil {
-		panic("No config.json found or not readable.")
+		panic("No config.json.example found or not readable.")
 	}
 
 	cfg := config{
@@ -68,7 +69,7 @@ func loadConfig() config {
 	decoder := json.NewDecoder(f)
 	err = decoder.Decode(&cfg)
 	if err != nil {
-		panic("Could not parse config.json, " + err.Error())
+		panic("Could not parse config.json.example, " + err.Error())
 	}
 
 	return cfg
