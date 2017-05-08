@@ -9,6 +9,7 @@ import (
 	"os"
 	"piego/db"
 	"piego/web"
+	"log"
 )
 
 type config struct {
@@ -22,11 +23,11 @@ type config struct {
 }
 
 func main() {
-
 	cfg := loadConfig()
 
 	fmt.Printf("Starting Piego webserver at %s:%d\n", cfg.ServerAddress, cfg.ServerPort)
 	db.InitDB(cfg.DBHost, cfg.DBPort, cfg.DBUser, cfg.DBPass, cfg.DBScheme)
+	defer db.CloseDB()
 
 	r := mux.NewRouter()
 
@@ -52,7 +53,7 @@ func main() {
 	loggedRouter := handlers.LoggingHandler(os.Stdout, r)
 	corsHandler := handlers.CORS(originsOk, headersOk, methodsOk)(loggedRouter)
 
-	panic(http.ListenAndServe(fmt.Sprintf("%s:%d", cfg.ServerAddress, cfg.ServerPort), corsHandler))
+	log.Fatal(http.ListenAndServe(fmt.Sprintf("%s:%d", cfg.ServerAddress, cfg.ServerPort), corsHandler))
 }
 
 func loadConfig() config {
