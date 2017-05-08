@@ -10,13 +10,7 @@ import (
 
 func UsersHandler(w http.ResponseWriter, r *http.Request) {
 	users := db.UsersAll()
-
-	for idx, _ := range users {
-		users[idx].FetchBalance()
-	}
-
 	s, err := json.Marshal(users)
-
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return

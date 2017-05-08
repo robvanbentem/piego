@@ -7,17 +7,17 @@ type User struct {
 	Balance float32 `db:"balance"`
 }
 
-func UsersAll() []User {
+func UsersAll() *[]User {
 	users := make([]User, 0)
-	db.Select(&users, "select u.*, if(sum(amount) IS NULL, 0.00, sum(amount)) as balance from users u left join ledger l on u.id = l.user_id group by u.id, l.user_id")
+	db.Select(&users, "SELECT u.*, if(SUM(amount) IS NULL, 0.00, SUM(amount)) AS balance FROM users u LEFT JOIN ledger l ON u.id = l.user_id GROUP BY u.id, l.user_id")
 
-	return users
+	return &users
 }
 
 func UsersFind(id int64) (User, error) {
 	var user User
 
-	err := db.Get(&user, "select u.*, if(sum(amount) IS NULL, 0.00, sum(amount)) as balance from users u left join ledger l on u.id = l.user_id where u.id = ? group by l.user_id", id)
+	err := db.Get(&user, "SELECT u.*, IF(SUM(amount) IS NULL, 0.00, SUM(amount)) AS balance FROM users u LEFT JOIN ledger l ON u.id = l.user_id WHERE u.id = ? GROUP BY l.user_id", id)
 
 	if err != nil {
 		return user, err
@@ -27,6 +27,6 @@ func UsersFind(id int64) (User, error) {
 }
 
 func (user *User) FetchBalance() {
-	rows := db.QueryRow("select sum(amount) as balance from ledger where user_id = ?", user.ID)
+	rows := db.QueryRow("SELECT sum(amount) AS balance FROM ledger WHERE user_id = ?", user.ID)
 	rows.Scan(&user.Balance)
 }

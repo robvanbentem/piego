@@ -8,10 +8,23 @@ import (
 	"os"
 	"piego/db"
 	"piego/web"
+	"encoding/json"
 )
 
+type config struct {
+	ServerAddress string
+	ServerPort    int
+	DBHost        string
+	DBUser        string
+	DBPass        string
+	DBScheme      string
+}
+
 func main() {
-	fmt.Printf("Starting Piego webserver\n")
+
+	cfg := loadConfig()
+
+	fmt.Printf("Starting Piego webserver at %s:%d\n", cfg.ServerAddress, cfg.ServerPort)
 	db.InitDB()
 
 	r := mux.NewRouter()
@@ -36,6 +49,27 @@ func main() {
 	methodsOk := handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS"})
 
 	loggedRouter := handlers.LoggingHandler(os.Stdout, r)
+	corsHandler := handlers.CORS(originsOk, headersOk, methodsOk)(loggedRouter)
 
-	panic(http.ListenAndServe("0.0.0.0:8004", handlers.CORS(originsOk, headersOk, methodsOk)(loggedRouter)))
+	panic(http.ListenAndServe(fmt.Sprintf("%s:%d", cfg.ServerAddress, cfg.ServerPort), corsHandler))
+}
+
+func loadConfig() config {
+	f, err := os.Open("config.json")
+	if err != nil {
+		panic("No config.json found or not readable.")
+	}
+
+	cfg := config{
+		ServerAddress: "0.0.0.0",
+		ServerPort:    8004,
+	}
+
+	decoder := json.NewDecoder(f)
+	err = decoder.Decode(&cfg)
+	if err != nil {
+		panic("Could not parse config.json, " + err.Error())
+	}
+
+	return cfg
 }

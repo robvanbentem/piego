@@ -15,22 +15,23 @@ type ShoplistEntry struct {
 	user *User
 }
 
-func ShoplistForDate(date string) ([]ShoplistEntry, error) {
+func ShoplistForDate(date string) (*[]ShoplistEntry, error) {
 	entries := make([]ShoplistEntry, 0)
 	err := db.Select(&entries, "select * from shoplist where date = ?", date)
 
-	return entries, err
+	return &entries, err
 }
 
-func ShoplistEntryFind(id int64) (ShoplistEntry, error) {
+func ShoplistEntryFind(id int64) (*ShoplistEntry, error) {
 	var entry ShoplistEntry
 	err := db.Get(&entry, "select * from shoplist where id = ?", id)
 
-	return entry, err
+	return &entry, err
 }
 
-func ShoplistEntryCreate(user int, shop int, name string, qty int, date string) (int64, error) {
-	result, err := db.Exec("insert into shoplist (user_id, shop_id, `name`, qty, `date`) values(?,?,?,?,?)", user, shop, name, qty, date)
+func ShoplistEntryCreate(e ShoplistEntry) (int64, error) {
+	result, err := db.Exec("INSERT INTO shoplist (user_id, shop_id, `name`, qty, `date`) VALUES(?,?,?,?,?)",
+		e.UserID, e.ShopID, e.Name, e.Qty, e.Date)
 
 	if err != nil {
 		return 0, err
@@ -41,7 +42,7 @@ func ShoplistEntryCreate(user int, shop int, name string, qty int, date string) 
 }
 
 func ShoplistEntryDelete(id int64) error {
-	result, err := db.Exec("delete from shoplist where id = ?", id)
+	result, err := db.Exec("DELETE FROM shoplist WHERE id = ?", id)
 
 	if err != nil {
 		return err
@@ -56,8 +57,8 @@ func ShoplistEntryDelete(id int64) error {
 	return nil
 }
 
-func ShoplistEntryUpdate(id int64, e *ShoplistEntry) error {
-	_, err := db.Exec("update shoplist set user_id = ?, shop_id = ?, name = ?, qty = ?, date = ? where id = ?",
+func ShoplistEntryUpdate(id int64, e ShoplistEntry) error {
+	_, err := db.Exec("UPDATE shoplist SET user_id = ?, shop_id = ?, name = ?, qty = ?, date = ? WHERE id = ?",
 		e.UserID, e.ShopID, e.Name, e.Qty, e.Date, id)
 
 	if err != nil {

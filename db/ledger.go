@@ -11,13 +11,13 @@ type LedgerEntry struct {
 func LedgerAll() (*[]LedgerEntry, error) {
 	entries := make([]LedgerEntry, 0)
 
-	err := db.Select(&entries, "select * from ledger")
+	err := db.Select(&entries, "SELECT * FROM ledger")
 	return &entries, err
 }
 
 func LedgerForDate(date string) (*[]LedgerEntry, error) {
 	entries := make([]LedgerEntry, 0)
 
-	err := db.Select(&entries, "select * from ledger where date = ?", date)
+	err := db.Select(&entries, "SELECT * FROM ledger WHERE `date` = ?", date)
 	return &entries, err
 }

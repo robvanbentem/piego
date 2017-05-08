@@ -5,10 +5,10 @@ type Shop struct {
 	Name string `db:"name"`
 }
 
-func ShopsAll() ([]Shop, error) {
-	var shops []Shop
-	err := db.Select(&shops, "select * from shops")
+func ShopsAll() (*[]Shop, error) {
+	var shops = make([]Shop, 0)
+	err := db.Select(&shops, "SELECT * FROM shops")
 
-	return shops, err
+	return &shops, err
 
 }

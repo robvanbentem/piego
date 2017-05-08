@@ -37,14 +37,13 @@ func ShoplistCreateHandler(w http.ResponseWriter, r *http.Request) {
 	var e db.ShoplistEntry
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&e)
-
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		log.Println(err)
 		return
 	}
 
-	id, err := db.ShoplistEntryCreate(e.UserID, e.ShopID, e.Name, e.Qty, e.Date)
+	id, err := db.ShoplistEntryCreate(e)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		log.Println(err)
@@ -74,14 +73,12 @@ func ShoplistDateHandler(w http.ResponseWriter, r *http.Request) {
 
 func ShoplistDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.ParseInt(mux.Vars(r)["id"], 10, 64)
-
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	err = db.ShoplistEntryDelete(id)
-
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -92,7 +89,6 @@ func ShoplistDeleteHandler(w http.ResponseWriter, r *http.Request) {
 
 func ShoplistUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.ParseInt(mux.Vars(r)["id"], 10, 64)
-
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		log.Print(err.Error())
@@ -103,8 +99,7 @@ func ShoplistUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	decoder.Decode(&e)
 
-	err = db.ShoplistEntryUpdate(id, &e)
-
+	err = db.ShoplistEntryUpdate(id, e)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		log.Print(err.Error())
