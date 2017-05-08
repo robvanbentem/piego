@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
+	"log"
 	"net/http"
 	"os"
 	"piego/db"
 	"piego/web"
-	"log"
 )
 
 type config struct {
@@ -44,6 +44,7 @@ func main() {
 	r.HandleFunc("/shoplist/entry/{id}", web.ShoplistUpdateHandler).Methods("PUT")
 
 	r.HandleFunc("/ledger", web.LedgerAllHandler).Methods("GET")
+	r.HandleFunc("/ledger/entry", web.LedgerEntryCreateHandler).Methods("POST")
 	r.HandleFunc("/ledger/{date}", web.LedgerDateHandler).Methods("GET")
 
 	headersOk := handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type"})
