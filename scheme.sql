@@ -50,5 +50,15 @@ CREATE TABLE `users` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
+DROP TABLE IF EXISTS `items`;
+CREATE TABLE `items` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `shop_id` int(11) unsigned NOT NULL,
+  `name` varchar(64) COLLATE utf8_unicode_ci NOT NULL,
+  `price` decimal(8,4) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `shop_id` (`shop_id`),
+  CONSTRAINT `items_ibfk_1` FOREIGN KEY (`shop_id`) REFERENCES `shops` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- 2017-05-05 15:07:04
