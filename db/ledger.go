@@ -1,8 +1,8 @@
 package db
 
 type LedgerEntry struct {
-	ID     int64   `db:"id"`
-	UserID int64   `db:"user_id"`
+	ID     uint    `db:"id"`
+	UserID uint    `db:"user_id"`
 	Name   string  `db:"name"`
 	Amount float32 `db:"amount"`
 	Date   string  `db:"date"`

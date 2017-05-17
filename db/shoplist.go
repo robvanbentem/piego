@@ -5,11 +5,11 @@ import (
 )
 
 type ShoplistEntry struct {
-	ID     int    `db:"id"`
-	UserID int    `db:"user_id"`
-	ShopID int    `db:"shop_id"`
+	ID     uint   `db:"id"`
+	UserID uint   `db:"user_id"`
+	ShopID uint   `db:"shop_id"`
 	Name   string `db:"name"`
-	Qty    int    `db:"qty"`
+	Qty    uint   `db:"qty"`
 	Date   string `db:"date"`
 
 	user *User

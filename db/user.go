@@ -1,7 +1,7 @@
 package db
 
 type User struct {
-	ID      int     `db:"id"`
+	ID      uint    `db:"id"`
 	Name    string  `db:"name"`
 	Enabled bool    `db:"enabled"`
 	Balance float32 `db:"balance"`

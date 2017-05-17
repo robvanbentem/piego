@@ -1,7 +1,7 @@
 package db
 
 type Shop struct {
-	ID   int64  `db:"id"`
+	ID   uint   `db:"id"`
 	Name string `db:"name"`
 }
 

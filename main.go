@@ -43,6 +43,8 @@ func registerRoutes(r *mux.Router) {
 	r.HandleFunc("/shops", web.ShopsAllHandler).Methods("GET")
 	r.HandleFunc("/users", web.UsersHandler).Methods("GET")
 	r.HandleFunc("/users/{id}", web.UsersFindHandler).Methods("GET")
+	r.HandleFunc("/items", web.ItemsAllHandler).Methods("GET")
+	r.HandleFunc("/items/search/{shopId}/{qry}", web.ItemsSearchHandler).Methods("GET")
 	r.HandleFunc("/shoplist/{date}", web.ShoplistDateHandler).Methods("GET")
 	r.HandleFunc("/shoplist/entry", web.ShoplistCreateHandler).Methods("POST")
 	r.HandleFunc("/shoplist/entry/{id}", web.ShoplistFindHandler).Methods("GET")
