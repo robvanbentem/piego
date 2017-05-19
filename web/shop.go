@@ -8,7 +8,6 @@ import (
 
 func ShopsAllHandler(w http.ResponseWriter, r *http.Request) {
 	shops, err := db.ShopsAll()
-
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 	}

@@ -2,12 +2,15 @@ package web
 
 import (
 	"encoding/json"
-	"github.com/gorilla/mux"
 	"log"
 	"net/http"
 	"piego/db"
-	"strconv"
 )
+
+type ItemSearchQry struct {
+	ShopID int64
+	Name   string
+}
 
 func ItemsAllHandler(w http.ResponseWriter, r *http.Request) {
 	items, err := db.ItemsAll()
@@ -28,15 +31,17 @@ func ItemsAllHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func ItemsSearchHandler(w http.ResponseWriter, r *http.Request) {
-	shopId, err := strconv.ParseInt(mux.Vars(r)["shopId"], 10, 64)
+	var searchQry ItemSearchQry
+	d := json.NewDecoder(r.Body)
+
+	err := d.Decode(&searchQry)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		log.Println(err.Error())
 		return
 	}
-	search := mux.Vars(r)["qry"]
 
-	items, err := db.ItemsSearch(shopId, search)
+	items, err := db.ItemsSearch(searchQry.ShopID, searchQry.Name)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		log.Println(err.Error())

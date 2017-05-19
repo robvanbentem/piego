@@ -32,7 +32,6 @@ func ShoplistEntryFind(id int64) (*ShoplistEntry, error) {
 func ShoplistEntryCreate(e ShoplistEntry) (int64, error) {
 	result, err := db.Exec("INSERT INTO shoplist (user_id, shop_id, `name`, qty, `date`) VALUES(?,?,?,?,?)",
 		e.UserID, e.ShopID, e.Name, e.Qty, e.Date)
-
 	if err != nil {
 		return 0, err
 	}
@@ -43,7 +42,6 @@ func ShoplistEntryCreate(e ShoplistEntry) (int64, error) {
 
 func ShoplistEntryDelete(id int64) error {
 	result, err := db.Exec("DELETE FROM shoplist WHERE id = ?", id)
-
 	if err != nil {
 		return err
 	}
@@ -60,7 +58,6 @@ func ShoplistEntryDelete(id int64) error {
 func ShoplistEntryUpdate(id int64, e ShoplistEntry) error {
 	_, err := db.Exec("UPDATE shoplist SET user_id = ?, shop_id = ?, name = ?, qty = ?, date = ? WHERE id = ?",
 		e.UserID, e.ShopID, e.Name, e.Qty, e.Date, id)
-
 	if err != nil {
 		return err
 	}

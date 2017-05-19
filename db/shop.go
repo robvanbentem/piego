@@ -10,5 +10,4 @@ func ShopsAll() (*[]Shop, error) {
 	err := db.Select(&shops, "SELECT * FROM shops")
 
 	return &shops, err
-
 }

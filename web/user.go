@@ -10,6 +10,7 @@ import (
 
 func UsersHandler(w http.ResponseWriter, r *http.Request) {
 	users := db.UsersAll()
+
 	s, err := json.Marshal(users)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -21,10 +22,9 @@ func UsersHandler(w http.ResponseWriter, r *http.Request) {
 
 func UsersFindHandler(w http.ResponseWriter, r *http.Request) {
 	idStr := mux.Vars(r)["id"]
-
 	id, _ := strconv.ParseInt(idStr, 10, 64)
-	user, err := db.UsersFind(id)
 
+	user, err := db.UsersFind(id)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		return

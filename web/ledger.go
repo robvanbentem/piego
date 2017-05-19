@@ -12,7 +12,6 @@ import (
 
 func LedgerAllHandler(w http.ResponseWriter, r *http.Request) {
 	entries, err := db.LedgerAll()
-
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		log.Print(err.Error())
@@ -33,7 +32,6 @@ func LedgerDateHandler(w http.ResponseWriter, r *http.Request) {
 	date := mux.Vars(r)["date"]
 
 	entries, err := db.LedgerForDate(date)
-
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		log.Print(err.Error())
