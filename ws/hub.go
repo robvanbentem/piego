@@ -6,12 +6,12 @@ package ws
 
 import (
 	"encoding/json"
-	"fmt"
+	"log"
 )
 
 type datamsg struct {
-	Event string            `json:"event"`
-	Data  map[string]string `json:"data"`
+	Event string                 `json:"event"`
+	Data  map[string]interface{} `json:"data"`
 }
 
 // hub maintains the set of active clients and broadcasts messages to the
@@ -43,10 +43,10 @@ func (h *Hub) Run() {
 	for {
 		select {
 		case client := <-h.register:
-			fmt.Printf("New ws client\n")
+			log.Printf("New ws client\n")
 			h.clients[client] = true
 		case client := <-h.unregister:
-			fmt.Printf("Disconnected ws client\n")
+			log.Printf("Disconnected ws client\n")
 			if _, ok := h.clients[client]; ok {
 				delete(h.clients, client)
 				close(client.send)
@@ -55,7 +55,7 @@ func (h *Hub) Run() {
 			var d datamsg
 			json.Unmarshal(message, &d)
 
-			fmt.Printf("New event: %s\n", d.Event)
+			log.Printf("New event: %s\n", d.Event)
 
 			for client := range h.clients {
 				select {
