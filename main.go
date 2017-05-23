@@ -10,6 +10,7 @@ import (
 	"os"
 	"piego/db"
 	"piego/web"
+	"piego/ws"
 )
 
 type config struct {
@@ -22,12 +23,17 @@ type config struct {
 	DBScheme      string
 }
 
+var hub *ws.Hub
+
 func main() {
 	cfg := loadConfig()
 
 	fmt.Printf("Starting Piego webserver at %s:%d\n", cfg.ServerAddress, cfg.ServerPort)
 	db.InitDB(cfg.DBHost, cfg.DBPort, cfg.DBUser, cfg.DBPass, cfg.DBScheme)
 	defer db.CloseDB()
+
+	hub = ws.NewHub()
+	go hub.Run()
 
 	r := mux.NewRouter()
 	registerRoutes(r)
@@ -54,6 +60,10 @@ func registerRoutes(r *mux.Router) {
 	r.HandleFunc("/ledger/entry", web.LedgerEntryCreateHandler).Methods("POST")
 	r.HandleFunc("/ledger/entry/{id}", web.LedgerEntryUpdateHandler).Methods("PUT")
 	r.HandleFunc("/ledger/{date}", web.LedgerDateHandler).Methods("GET")
+
+	r.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
+		ws.WSHandler(hub, w, r)
+	})
 }
 
 func getCorsHandler(loggedRouter http.Handler) http.Handler {
