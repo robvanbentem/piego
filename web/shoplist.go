@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"piego/db"
+	"piego/ws"
 	"strconv"
 )
 
@@ -50,6 +51,8 @@ func ShoplistCreateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	ws.GetHub().BroadcastEvent("shoplist.created", map[string]int64{"id": id})
+
 	http.Redirect(w, r, fmt.Sprintf("/shoplist/entry/%d", id), 302)
 }
 
@@ -84,6 +87,8 @@ func ShoplistDeleteHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	ws.GetHub().BroadcastEvent("shoplist.deleted", map[string]int64{"id": id})
+
 	w.WriteHeader(http.StatusOK)
 }
 
@@ -105,6 +110,8 @@ func ShoplistUpdateHandler(w http.ResponseWriter, r *http.Request) {
 		log.Print(err.Error())
 		return
 	}
+
+	ws.GetHub().BroadcastEvent("shoplist.updated", map[string]int64{"id": id})
 
 	http.Redirect(w, r, fmt.Sprintf("/shoplist/entry/%d", id), 302)
 }

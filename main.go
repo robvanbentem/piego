@@ -23,8 +23,6 @@ type config struct {
 	DBScheme      string
 }
 
-var hub *ws.Hub
-
 func main() {
 	cfg := loadConfig()
 
@@ -32,8 +30,7 @@ func main() {
 	db.InitDB(cfg.DBHost, cfg.DBPort, cfg.DBUser, cfg.DBPass, cfg.DBScheme)
 	defer db.CloseDB()
 
-	hub = ws.NewHub()
-	go hub.Run()
+	ws.Init()
 
 	r := mux.NewRouter()
 	registerRoutes(r)
@@ -62,7 +59,7 @@ func registerRoutes(r *mux.Router) {
 	r.HandleFunc("/ledger/{date}", web.LedgerDateHandler).Methods("GET")
 
 	r.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
-		ws.WSHandler(hub, w, r)
+		ws.WSHandler(ws.GetHub(), w, r)
 	})
 }
 
