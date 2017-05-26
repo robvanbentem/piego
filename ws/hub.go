@@ -11,7 +11,7 @@ import (
 
 var hub *Hub
 
-type datamsg struct {
+type ClientMessage struct {
 	Event string                 `json:"event"`
 	Data  map[string]interface{} `json:"data"`
 }
@@ -63,13 +63,13 @@ func (h *Hub) Run() {
 				close(client.send)
 			}
 		case message := <-h.broadcast:
-			var d datamsg
+			var d ClientMessage
 			json.Unmarshal(message.Message, &d)
 
 			log.Printf("New event: %s\n", d.Event)
 
 			if (d.Event == "identify") {
-				ident := string(d.Data["identity"])
+				ident := d.Data["identity"].(string)
 				message.Client.Identity = ident
 				log.Printf("Client identified as %s\n", ident)
 				continue
