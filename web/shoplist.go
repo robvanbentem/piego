@@ -113,5 +113,5 @@ func ShoplistUpdateHandler(w http.ResponseWriter, r *http.Request) {
 
 	ws.GetHub().BroadcastEvent("shoplist.updated", map[string]int64{"id": id})
 
-	http.Redirect(w, r, fmt.Sprintf("/shoplist/entry/%d", id), 302)
+	w.WriteHeader(http.StatusOK)
 }

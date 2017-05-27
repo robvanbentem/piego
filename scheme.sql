@@ -26,6 +26,7 @@ CREATE TABLE `shoplist` (
   `name` varchar(128) COLLATE utf8_unicode_ci NOT NULL,
   `qty` tinyint(3) unsigned NOT NULL,
   `date` date NOT NULL,
+  `remark` varchar(256) COLLATE utf8_unicode_ci NOT NULL,
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
   KEY `shop_id` (`shop_id`),

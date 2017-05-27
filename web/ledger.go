@@ -82,5 +82,5 @@ func LedgerEntryUpdateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, fmt.Sprintf("/ledger/entry/%d", id), 302)
+	w.WriteHeader(http.StatusOK)
 }
