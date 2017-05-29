@@ -71,9 +71,9 @@ func getCorsHandler(loggedRouter http.Handler) http.Handler {
 }
 
 func loadConfig() config {
-	f, err := os.Open("config.json.example")
+	f, err := os.Open("config.json")
 	if err != nil {
-		panic("No config.json.example found or not readable.")
+		panic("No config.json found or not readable.")
 	}
 
 	cfg := config{
